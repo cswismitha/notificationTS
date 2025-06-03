@@ -3,8 +3,8 @@ import sgMail from '@sendgrid/mail';
 import config from '../config/config';
 
 export class EmailService {
-    constructor() {
-        sgMail.setApiKey(config.sgapikey);
+    constructor(sgapikey: string) {
+        sgMail.setApiKey(sgapikey);
     }
 
     async send() {
@@ -15,7 +15,7 @@ export class EmailService {
         const textBody: string = 'This is the plain text content.';
         const htmlBody: string = '<p>This is the <strong>HTML</strong> content.</p>';
 
-        if (!config.sgapikey || !fromEmail || !toEmail) {
+        if (!fromEmail || !toEmail) {
             console.error("Missing required information: API Key, From Email, or To Email.");
             return {
                 statusCode: 400,

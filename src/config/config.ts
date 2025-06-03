@@ -10,7 +10,9 @@ interface AppConfig {
     awsregion: string;
     sqsURL: string;
     azqueue: AzureQueueConfig;
-    frommailid: string
+    frommailid: string;
+    vault: string;
+    clientID: string;
 }
 
 const config: AppConfig = {
@@ -22,7 +24,9 @@ const config: AppConfig = {
     azqueue: {
         queuename: process.env.AZQUEUE_NAME || 'js-queue-items',
         queueurl: 'AzureWebJobsStorage'
-    }
+    },
+    vault: process.env.KEY_VAULT_URL,
+    clientID: process.env.CLIENT_ID
 };
 
 export default config;

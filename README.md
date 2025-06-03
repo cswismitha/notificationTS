@@ -153,12 +153,20 @@ Summary Container:
 - id (appId), summary, updated
 ```
 
+### Azure Key vault
+- `sgKey` - stores send grid key
+
+### AWS Secret Manager
+- `poc\sentiment` - Secret Name
+- `sgKey` - stores send grid key
+
 ## 🔐 Security & Permissions
 
 ### AWS IAM Permissions
 - `AWSLambdaBasicExecutionRole`
 - `AmazonDynamoDBFullAccess`
 - `AmazonSQSFullAccess`
+- `SecretsManagerReadWrite`
 
 ### Azure Permissions
 - Cosmos DB read/write access

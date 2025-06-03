@@ -1,11 +1,13 @@
-import { IQueueProvider } from "./interfaces/IQueueProvider";
+import { SecretsManagerProvider } from "./aws/SecretsManagerProvider";
+import { KeyVaultProvider } from "./azure/KeyVaultProvider";
+import { ISecretsProvider } from "./interfaces/ISecretsProvider";
 import { EmailService } from "./services/EmailService";
 
 /**
- * A simple Lambda function that processes an API Gateway proxy event.
- * It echoes the request body and adds a greeting.
+ * A simple function that processes an SQS event or Queue trigger.
+ * It sends the notification of summary.
  *
- * @param event The API Gateway proxy event.
+ * @param queueItem The SQS event/Queue Trigger.
  * @param context The Lambda context object.
  * @returns A Promise that resolves to an API Gateway proxy result.
  */
@@ -18,22 +20,30 @@ export const handler = async ( queueItem: any, context: any ): Promise<any> => {
     'Access-Control-Allow-Origin': '*', // CORS for API Gateway
   };
 
-  try {    
-    let requestBody: any = null;
+  try {
+    let secProvider: ISecretsProvider;
+    let sgapikey: string = '';
     // Handling request based on platform
     if (platform === 'azure') {
-      console.log('Storage queue function processed work item:', queueItem);
+      secProvider = new KeyVaultProvider();
+      sgapikey = await secProvider.getSecret('sgKey');
+      console.log('Storage queue function processed work item:', sgapikey);
     } else if (platform === 'aws') {
-      console.log('Storage queue function processed work item:', queueItem);
+      secProvider = new SecretsManagerProvider();
+      const sgsecret = await secProvider.getSecret('poc/sentiment');
+      console.log('Storage queue function processed work item:', sgsecret);
+      const { sgKey } = JSON.parse(sgsecret);
+      sgapikey = sgKey;
+      console.log('Storage queue function processed work item:', sgapikey);
     } else {
       console.log("Platform not supported");
-    }
-    const emailService = new EmailService();
+    }      
+    const emailService = new EmailService(sgapikey);
     await emailService.send();
     console.log('Processed');
     responseBody = {
-             message: 'Email sent successfully!'
-        };
+      message: 'Email sent successfully!'
+    };
     
   } catch (error: any) {
     console.error('Error processing event:', error);
